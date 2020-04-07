@@ -1,0 +1,14 @@
+{
+   "name": "node-api1-project",
+   "version": "1.0.0",
+   "main": "index.js",
+   "repository": "https://github.com/Karavil/node-api1-project.git",
+   "author": "Alex Karavil <alex@karavil.io>",
+   "license": "MIT",
+   "scripts": {
+      "server": "nodemon index.js"
+   },
+   "devDependencies": {
+      "nodemon": "^2.0.2"
+   }
+}

@@ -21,9 +21,9 @@ var app = express_1.default();
 var SERVER_PORT = 5000;
 app.use(express_1.default.json());
 var id = 0;
-var users = new Map();
+var users = [];
 app.get("/api/users", function (req, res) {
-    if (users.size > 0) {
+    if (users.length > 0) {
         res.status(200).json({ users: users });
     }
     res.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json({
@@ -32,19 +32,37 @@ app.get("/api/users", function (req, res) {
 });
 app.post("/api/users", function (req, res) {
     //Create new user object from the request body and assign an id
-    var newUser = { name: req.body.name, bio: req.body.bio };
-    users.set(id++, newUser);
-    console.log(users);
+    var newUser = { id: id++, name: req.body.name, bio: req.body.bio };
+    users.push(newUser);
     //Log to server console
     console.log("New user added", newUser);
-    //Return updated list with a successful post request
-    var userList = [];
-    users.forEach(function (value, key) {
-        userList.push(__assign(__assign({}, value), { id: key }));
-    });
     res.status(http_status_codes_1.default.CREATED).json({
         message: "New user added, returning updated list of users.",
-        users: userList,
+        users: users,
+    });
+});
+app.delete("/api/users/:id", function (req, res) {
+    var searchID = parseInt(req.params.id);
+    users = users.filter(function (user) { return user.id !== searchID; });
+    res.json({ users: users });
+});
+app.patch("/api/users/:id", function (req, res) {
+    var searchID = parseInt(req.params.id);
+    users = users.map(function (user) {
+        if (user.id === searchID) {
+            return __assign(__assign({}, user), req.body);
+        }
+        return user;
+    });
+    res.status(http_status_codes_1.default.OK).json({ users: users });
+});
+app.get("/api/users/:id", function (req, res) {
+    var searchID = parseInt(req.params.id);
+    var user = users.find(function (user) { return user.id === searchID; });
+    if (user)
+        res.status(http_status_codes_1.default.OK).json({ user: user });
+    res.status(http_status_codes_1.default.NOT_FOUND).json({
+        errorMessage: "User not found.",
     });
 });
 app.listen(SERVER_PORT, function () {
